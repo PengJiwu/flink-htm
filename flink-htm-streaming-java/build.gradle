@@ -16,17 +16,17 @@ jar {
 
 dependencies {
     // logging
-    compile 'org.slf4j:slf4j-api:1.7.13'
+    compile "org.slf4j:slf4j-api:$slf4jVersion"
 
     // htm.java
-    compile 'org.numenta:htm.java:0.6.8'
+    compile "org.numenta:htm.java:$htmJavaVersion"
 
     // flink
-    compile 'org.apache.flink:flink-java:1.0.0'
-    compile 'org.apache.flink:flink-streaming-java_2.11:1.0.0'
+    compile "org.apache.flink:flink-java:$flinkVersion"
+    compile "org.apache.flink:flink-streaming-java_2.11:$flinkVersion"
 
     // test framework
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.apache.flink:flink-test-utils_2.11:1.0.0'
-    testCompile 'org.apache.flink:flink-streaming-java_2.11:1.0.0:tests'
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.apache.flink:flink-test-utils_2.11:$flinkVersion"
+    testCompile "org.apache.flink:flink-streaming-java_2.11:$flinkVersion:tests"
 }

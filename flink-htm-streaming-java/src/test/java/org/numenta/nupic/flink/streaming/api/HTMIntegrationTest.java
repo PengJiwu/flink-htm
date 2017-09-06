@@ -61,7 +61,7 @@ public class HTMIntegrationTest extends StreamingMultipleProgramsTestBase {
                 .select(new InferenceSelectFunction<TestHarness.DayDemoRecord, Tuple3<Integer,Double,Double>>() {
                     @Override
                     public Tuple3<Integer,Double,Double> select(Tuple2<TestHarness.DayDemoRecord,NetworkInference> inference) throws Exception {
-                        return new Tuple3(
+                        return new Tuple3<>(
                                 inference.f0.dayOfWeek,
                                 (Double) inference.f1.getClassification("dayOfWeek").getMostProbableValue(1),
                                 inference.f1.getAnomalyScore());
@@ -96,7 +96,7 @@ public class HTMIntegrationTest extends StreamingMultipleProgramsTestBase {
             .select(new InferenceSelectFunction<TestHarness.DayDemoRecord, Tuple3<Integer,Double,Double>>() {
                 @Override
                 public Tuple3<Integer,Double,Double> select(Tuple2<TestHarness.DayDemoRecord,NetworkInference> inference) throws Exception {
-                    return new Tuple3(
+                    return new Tuple3<>(
                             inference.f0.dayOfWeek,
                             (Double) inference.f1.getClassification("dayOfWeek").getMostProbableValue(1),
                             inference.f1.getAnomalyScore());
@@ -128,7 +128,7 @@ public class HTMIntegrationTest extends StreamingMultipleProgramsTestBase {
                         .select(new InferenceSelectFunction<TestHarness.DayDemoRecord, Tuple3<Integer,Double,Double>>() {
                             @Override
                             public Tuple3<Integer,Double,Double> select(Tuple2<TestHarness.DayDemoRecord,NetworkInference> inference) throws Exception {
-                                return new Tuple3(
+                                return new Tuple3<>(
                                         inference.f0.dayOfWeek,
                                         (Double) inference.f1.getClassification("dayOfWeek").getMostProbableValue(1),
                                         inference.f1.getAnomalyScore());

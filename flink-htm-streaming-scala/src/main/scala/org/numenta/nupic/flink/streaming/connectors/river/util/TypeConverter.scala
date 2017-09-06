@@ -4,7 +4,7 @@ import org.apache.flink.api.common.ExecutionConfig
 import org.apache.flink.api.common.typeinfo.{BasicTypeInfo, TypeInformation}
 import org.apache.flink.api.common.typeutils.CompositeType
 import org.apache.flink.api.scala._
-import org.apache.flink.streaming.util.FieldAccessor
+import org.apache.flink.streaming.util.typeutils.FieldAccessorFactory
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
 import spray.json._
@@ -34,7 +34,7 @@ class TypeConverter[T: TypeInformation : ClassTag]
 
   private val keySetter: KeySetter = {
     val accessor = typeInfo match {
-      case ti if ti.hasField("streamId") => Some(FieldAccessor.create[T,AnyRef]("streamId", typeInfo, executionConfig))
+      case ti if ti.hasField("streamId") => Some(FieldAccessorFactory.getAccessor[T,AnyRef](typeInfo, "streamId", executionConfig))
       case _ => None
     }
     accessor match {
@@ -46,7 +46,7 @@ class TypeConverter[T: TypeInformation : ClassTag]
   private type ValueSetter = (T,JsValue) => T
 
   private val setters: Seq[ValueSetter] = jsFields.map { fieldName =>
-    val accessor = FieldAccessor.create[T,AnyRef](fieldName, typeInfo, executionConfig)
+    val accessor = FieldAccessorFactory.getAccessor[T,AnyRef](typeInfo, fieldName, executionConfig)
 
     val converter = accessor.getFieldType match {
       case ti if ti == STRING_TYPE_INFO => (value: JsValue) => value.asInstanceOf[JsString].value

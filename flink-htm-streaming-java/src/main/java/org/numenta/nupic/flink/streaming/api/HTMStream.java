@@ -5,6 +5,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.functions.NullByteKeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.typeutils.TupleTypeInfo;
 import org.apache.flink.api.java.typeutils.TypeExtractor;
@@ -12,7 +13,6 @@ import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.numenta.nupic.flink.streaming.api.operator.GlobalHTMInferenceOperator;
 import org.numenta.nupic.flink.streaming.api.operator.KeyedHTMInferenceOperator;
 
 /**
@@ -82,8 +82,10 @@ public class HTMStream<T> {
         TypeInformation<R> returnType = TypeExtractor.getUnaryOperatorReturnType(
                 inferenceSelectFunction,
                 InferenceSelectFunction.class,
-                false,
-                false,
+                0,
+                1,
+                new int[]{0, 0},
+                TypeExtractor.NO_INDEX,
                 inputType,
                 null,
                 false);
@@ -95,6 +97,7 @@ public class HTMStream<T> {
         final DataStream<Tuple2<T, NetworkInference>> inferenceStream = inferenceStreamBuilder.build();
 
         return inferenceStream
+                .forward()
                 .map(new InferenceSelectMapper<T, R>(clean(inferenceSelectFunction)))
                 .returns(returnType);
     }
@@ -157,14 +160,16 @@ public class HTMStream<T> {
                 ).name("Learn");
 
             } else {
-                // all stream elements will be processed by a single Network instance, hence parallelism -> 1.
-                GlobalHTMInferenceOperator<T> operator = new GlobalHTMInferenceOperator<>(
-                        input.getExecutionConfig(), input.getType(), isProcessingTime, networkFactory, resetFunction);
-                inferenceStream = input.transform(
+                KeySelector<T, Byte> keySelector = new NullByteKeySelector<>();
+                TypeSerializer<Byte> keySerializer = TypeInformation.of(Byte.class).createSerializer(input.getExecutionConfig());
+
+                KeyedHTMInferenceOperator<T, Byte> operator = new KeyedHTMInferenceOperator<>(
+                        input.getExecutionConfig(), input.getType(), isProcessingTime, keySelector, keySerializer, networkFactory, resetFunction);
+                inferenceStream = input.keyBy(keySelector).transform(
                         INFERENCE_OPERATOR_NAME,
                         inferenceStreamTypeInfo,
                         operator
-                ).name("Learn").setParallelism(1);
+                ).name("Learn").forceNonParallel();
             }
 
             return inferenceStream;

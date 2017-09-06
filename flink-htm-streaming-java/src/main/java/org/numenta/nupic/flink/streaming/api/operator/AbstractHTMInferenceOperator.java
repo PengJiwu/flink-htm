@@ -124,7 +124,7 @@ public abstract class AbstractHTMInferenceOperator<IN>
         if(inference != null) {
             NetworkInference outputInference = NetworkInference.fromInference(inference);
             StreamRecord<Tuple2<IN,NetworkInference>> streamRecord = new StreamRecord<>(
-                    new Tuple2(record, outputInference),
+                    new Tuple2<>(record, outputInference),
                     timestamp);
             output.collect(streamRecord);
         }

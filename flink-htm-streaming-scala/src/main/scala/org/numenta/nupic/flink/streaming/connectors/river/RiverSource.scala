@@ -3,7 +3,7 @@ package org.numenta.nupic.flink.streaming.connectors.river
 import java.util.concurrent.Executors
 
 import akka.actor.ActorSystem
-import com.typesafe.config.{ConfigFactory, Config}
+import com.typesafe.config.{Config, ConfigFactory}
 import RiverSource._
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.common.typeutils.CompositeType
@@ -13,7 +13,7 @@ import org.apache.flink.streaming.api.checkpoint.Checkpointed
 import org.apache.flink.streaming.api.functions.source.{RichParallelSourceFunction, RichSourceFunction}
 import org.apache.flink.streaming.api.functions.source.SourceFunction.SourceContext
 import org.apache.flink.streaming.api.watermark.Watermark
-import org.apache.flink.streaming.util.FieldAccessor
+import org.apache.flink.streaming.util.typeutils.FieldAccessorFactory
 import org.apache.flink.util.MutableObjectIterator
 import org.joda.time.{DateTime, DateTimeZone}
 import org.numenta.nupic.flink.streaming.connectors.river.util.TypeConverter
@@ -22,7 +22,7 @@ import spray.client.pipelining._
 
 import scala.collection.JavaConversions._
 import scala.concurrent.duration._
-import scala.concurrent.{Future, Await, ExecutionContext}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.reflect.ClassTag
 import scala.util.{Failure, Success}
 
@@ -152,7 +152,7 @@ class RiverSource[T >: Null <: AnyRef: TypeInformation : ClassTag](
 
     implicit val executionConfig = getRuntimeContext.getExecutionConfig
 
-    private val datetimeAccessor = FieldAccessor.create[T,DateTime]("datetime", typeInfo, executionConfig)
+    private val datetimeAccessor = FieldAccessorFactory.getAccessor[T,DateTime](typeInfo, "datetime", executionConfig)
 
     /**
       * The internal iterator over the totally-ordered elements across all streams.

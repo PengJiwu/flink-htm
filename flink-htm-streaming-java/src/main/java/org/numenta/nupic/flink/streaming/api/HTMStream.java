@@ -99,6 +99,7 @@ public class HTMStream<T> {
         return inferenceStream
                 .forward()
                 .map(new InferenceSelectMapper<T, R>(clean(inferenceSelectFunction)))
+                .name("Select")
                 .returns(returnType);
     }
 

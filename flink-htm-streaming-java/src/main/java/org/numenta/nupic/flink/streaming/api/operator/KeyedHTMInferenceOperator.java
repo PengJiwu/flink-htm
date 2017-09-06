@@ -17,7 +17,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author Eron Wright
+ *
+ * HTM inference operator implementation which is used for keyed streams.
  */
 public class KeyedHTMInferenceOperator<IN, KEY> extends AbstractHTMInferenceOperator<IN> {
 
@@ -31,11 +32,6 @@ public class KeyedHTMInferenceOperator<IN, KEY> extends AbstractHTMInferenceOper
 
     // necessary to create an HTM network per key.
     private final NetworkFactory<IN> networkFactory;
-
-    // stores the keys we've already seen to trigger execution upon receiving a watermark
-    // this can be problematic, since it is never cleared
-    // TODO: fix once the state refactoring is completed
-    private transient Set<KEY> keys;
 
     // stores the per-key network
     private transient ValueState<Network> networkState;
@@ -59,15 +55,10 @@ public class KeyedHTMInferenceOperator<IN, KEY> extends AbstractHTMInferenceOper
     public void open() throws Exception {
         super.open();
 
-        if (keys == null) {
-            keys = new HashSet<KEY>();
-        }
-
         if (networkState == null) {
             networkState = getPartitionedState(new ValueStateDescriptor<Network>(
                     HTM_INFERENCE_OPERATOR_STATE_NAME,
-                    new KryoSerializer<Network>((Class<Network>) (Class<?>) Network.class, getExecutionConfig()),
-                    null
+                    new KryoSerializer<Network>((Class<Network>) (Class<?>) Network.class, getExecutionConfig())
             ));
         }
 
@@ -78,20 +69,12 @@ public class KeyedHTMInferenceOperator<IN, KEY> extends AbstractHTMInferenceOper
     protected Network getInputNetwork() throws Exception {
         Network network = networkState.value();
         if(network == null) {
-            Object currentKey = getStateBackend().getCurrentKey();
-            network = networkFactory.createNetwork(currentKey);
+            network = networkFactory.createNetwork(null);
             networkState.update(network);
 
             networkCounter.add(1);
             LOG.info("Created HTM network {}", network.getName());
         }
         return network;
-    }
-
-    @Override
-    public void processElement(StreamRecord<IN> element) throws Exception {
-        keys.add(keySelector.getKey(element.getValue()));
-
-        super.processElement(element);
     }
 }

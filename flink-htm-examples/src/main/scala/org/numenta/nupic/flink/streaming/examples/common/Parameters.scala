@@ -33,12 +33,11 @@ object NetworkDemoParameters {
         SYN_PERM_ACTIVE_INC -> 0.1,
         SYN_PERM_TRIM_THRESHOLD -> 0.05,
         SYN_PERM_CONNECTED -> 0.1,
-        MIN_PCT_OVERLAP_DUTY_CYCLE -> 0.1,
-        MIN_PCT_ACTIVE_DUTY_CYCLE -> 0.1,
+        MIN_PCT_OVERLAP_DUTY_CYCLES -> 0.1,
+        MIN_PCT_ACTIVE_DUTY_CYCLES -> 0.1,
         DUTY_CYCLE_PERIOD -> 10,
         MAX_BOOST -> 10.0,
         SEED -> 42,
-        SP_VERBOSITY -> 0,
 
         //Temporal Memory specific
         INITIAL_PERMANENCE -> 0.2,
@@ -85,7 +84,6 @@ trait WorkshopAnomalyParameters {
       MAX_BOOST -> 1.0,
       NUM_ACTIVE_COLUMNS_PER_INH_AREA -> 40,
       SEED -> 1956,
-      SP_VERBOSITY -> 0,
       SYN_PERM_ACTIVE_INC -> 0.003,
       SYN_PERM_CONNECTED -> 0.2,
       SYN_PERM_INACTIVE_DEC -> 0.0005,

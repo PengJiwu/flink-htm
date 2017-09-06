@@ -13,7 +13,7 @@ object Parameters {
 
   def apply(parameters: (jnupic.Parameters.KEY, Any)*): jnupic.Parameters = {
     val p = jnupic.Parameters.empty()
-    parameters.foreach { case (key, value) => p.setParameterByKey(key, value) }
+    parameters.foreach { case (key, value) => p.set(key, value) }
     p
   }
 }

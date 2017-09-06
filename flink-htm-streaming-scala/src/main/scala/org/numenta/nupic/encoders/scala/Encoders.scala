@@ -58,15 +58,15 @@ object Encoders {
 
   implicit class RichEncoder[T <: jencoders.Encoder.Builder[_, _]](builder: T) {
     def defaults: T = {
-      builder.n(params.getParameterByKey(KEY.N).asInstanceOf[Int])
-      builder.w(params.getParameterByKey(KEY.W).asInstanceOf[Int])
-      builder.minVal(params.getParameterByKey(KEY.MIN_VAL).asInstanceOf[Double])
-      builder.maxVal(params.getParameterByKey(KEY.MAX_VAL).asInstanceOf[Double])
-      builder.radius(params.getParameterByKey(KEY.RADIUS).asInstanceOf[Double])
-      builder.resolution(params.getParameterByKey(KEY.RESOLUTION).asInstanceOf[Double])
-      builder.periodic(params.getParameterByKey(KEY.PERIODIC).asInstanceOf[Boolean])
-      builder.clipInput(params.getParameterByKey(KEY.CLIP_INPUT).asInstanceOf[Boolean])
-      builder.forced(params.getParameterByKey(KEY.FORCED).asInstanceOf[Boolean])
+      builder.n(params.get(KEY.N).asInstanceOf[Int])
+      builder.w(params.get(KEY.W).asInstanceOf[Int])
+      builder.minVal(params.get(KEY.MIN_VAL).asInstanceOf[Double])
+      builder.maxVal(params.get(KEY.MAX_VAL).asInstanceOf[Double])
+      builder.radius(params.get(KEY.RADIUS).asInstanceOf[Double])
+      builder.resolution(params.get(KEY.RESOLUTION).asInstanceOf[Double])
+      builder.periodic(params.get(KEY.PERIODIC).asInstanceOf[Boolean])
+      builder.clipInput(params.get(KEY.CLIP_INPUT).asInstanceOf[Boolean])
+      builder.forced(params.get(KEY.FORCED).asInstanceOf[Boolean])
       builder
     }
   }

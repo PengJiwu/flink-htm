@@ -2,8 +2,9 @@ package org.numenta.nupic.flink.streaming.api.codegen;
 
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.typeutils.CompositeType;
+import org.apache.flink.streaming.util.typeutils.FieldAccessor;
+import org.apache.flink.streaming.util.typeutils.FieldAccessorFactory;
 import org.numenta.nupic.flink.streaming.api.operator.EncoderInputFunction;
-import org.apache.flink.streaming.util.FieldAccessor;
 import org.numenta.nupic.encoders.Encoder;
 import org.numenta.nupic.encoders.EncoderTuple;
 import org.numenta.nupic.encoders.MultiEncoder;
@@ -51,12 +52,12 @@ public class GenerateEncoderInputFunction<T> {
                 .collect(Collectors.toList());
         if(nonExistentFields.size() > 0) {
             throw new IllegalArgumentException(String.format("encoder refers to non-existent field(s) [%s]",
-                    nonExistentFields.stream().map(f -> f.getName()).collect(Collectors.joining(","))));
+                    nonExistentFields.stream().map(EncoderTuple::getName).collect(Collectors.joining(","))));
         }
 
         // lookup an accessor function for each field
         final Map<String, Function<T,Object>> accessors = encoders.stream()
-                .collect(Collectors.toMap(EncoderTuple::getName, encoder -> fieldAccessorFor(encoder)));
+                .collect(Collectors.toMap(EncoderTuple::getName, this::fieldAccessorFor));
 
         return new EncoderInputFunction<T>() {
             @Override
@@ -81,7 +82,7 @@ public class GenerateEncoderInputFunction<T> {
      * @return a function to produce the input value for the encoder.
      */
     private Function<T,Object> fieldAccessorFor(EncoderTuple encoderTuple) {
-        FieldAccessor fieldAccessor = FieldAccessor.create(encoderTuple.getName(), inputTypeInfo, config);
+        FieldAccessor fieldAccessor = FieldAccessorFactory.getAccessor(inputTypeInfo, encoderTuple.getName(), config);
         Encoder encoder = encoderTuple.getEncoder();
 
         if(encoder instanceof ScalarEncoder) {

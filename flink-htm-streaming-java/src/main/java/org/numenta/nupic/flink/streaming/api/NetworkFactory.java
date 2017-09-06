@@ -18,5 +18,5 @@ public interface NetworkFactory<T> extends Serializable {
      * @param key the key, or null.
      * @return a network instance.
      */
-    Network createNetwork(Object key);
+    Network createNetwork(@Deprecated Object key);
 }

@@ -22,25 +22,25 @@ dependencies {
     compile project(':flink-htm-streaming-java')
     
     // scala
-    compile 'org.scala-lang:scala-library:2.11.7'
+    compile "org.scala-lang:scala-library:$scalaVersion"
 
     // htm.java
-    compile 'org.numenta:htm.java:0.6.8'
+    compile "org.numenta:htm.java:$htmJavaVersion"
 
     // flink
-    compile 'org.apache.flink:flink-scala_2.11:1.0.0'
-    compile 'org.apache.flink:flink-streaming-scala_2.11:1.0.0'
-    compile 'de.javakaffee:kryo-serializers:0.37'
+    compile "org.apache.flink:flink-scala_2.11:$flinkVersion"
+    compile "org.apache.flink:flink-streaming-scala_2.11:$flinkVersion"
+    compile "de.javakaffee:kryo-serializers:$kryoVersion"
     
     // spray http client
-    compile 'io.spray:spray-client_2.11:1.3.3'
-    compile 'io.spray:spray-json_2.11:1.3.2'
+    compile "io.spray:spray-client_2.11:$sprayVersion"
+    compile "io.spray:spray-json_2.11:$sprayVersion"
 
     testCompile files(project(':flink-htm-streaming-java').sourceSets.test.output.classesDir)
 
-    testCompile "org.scalatest:scalatest_2.11:2.2.6"
+    testCompile "org.scalatest:scalatest_2.11:$scalatestVersion"
 
-    testCompile 'junit:junit:4.11'
-    testCompile 'org.apache.flink:flink-test-utils_2.11:1.0.0'
-    testCompile 'org.apache.flink:flink-streaming-java_2.11:1.0.0:tests'
+    testCompile "junit:junit:$junitVersion"
+    testCompile "org.apache.flink:flink-test-utils_2.11:$flinkVersion"
+    testCompile "org.apache.flink:flink-streaming-java_2.11:$flinkVersion:tests"
 }

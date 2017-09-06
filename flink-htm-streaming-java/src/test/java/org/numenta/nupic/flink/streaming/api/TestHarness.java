@@ -1,22 +1,21 @@
 package org.numenta.nupic.flink.streaming.api;
 
 import org.numenta.nupic.Parameters;
-import org.numenta.nupic.algorithms.Anomaly;
-import org.numenta.nupic.algorithms.SpatialPooler;
-import org.numenta.nupic.algorithms.TemporalMemory;
+import org.numenta.nupic.algorithms.*;
 import org.numenta.nupic.encoders.Encoder;
 import org.numenta.nupic.encoders.MultiEncoder;
 import org.numenta.nupic.network.Network;
 import org.numenta.nupic.util.MersenneTwister;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import static org.numenta.nupic.algorithms.Anomaly.KEY_MODE;
 
 /**
- * @author Eron Wright
+ * HTM models for test purposes.
  */
 public class TestHarness {
 
@@ -63,14 +62,14 @@ public class TestHarness {
         public Network createNetwork(Object key) {
             Parameters p = getParameters();
             p = p.union(getEncoderParams());
-            p.setParameterByKey(Parameters.KEY.COLUMN_DIMENSIONS, new int[] { 30 });
-            p.setParameterByKey(Parameters.KEY.SYN_PERM_INACTIVE_DEC, 0.1);
-            p.setParameterByKey(Parameters.KEY.SYN_PERM_ACTIVE_INC, 0.1);
-            p.setParameterByKey(Parameters.KEY.SYN_PERM_TRIM_THRESHOLD, 0.05);
-            p.setParameterByKey(Parameters.KEY.SYN_PERM_CONNECTED, 0.4);
-            p.setParameterByKey(Parameters.KEY.MAX_BOOST, 10.0);
-            p.setParameterByKey(Parameters.KEY.DUTY_CYCLE_PERIOD, 7);
-            p.setParameterByKey(Parameters.KEY.RANDOM, new MersenneTwister(42));
+            p.set(Parameters.KEY.COLUMN_DIMENSIONS, new int[] { 30 });
+            p.set(Parameters.KEY.SYN_PERM_INACTIVE_DEC, 0.1);
+            p.set(Parameters.KEY.SYN_PERM_ACTIVE_INC, 0.1);
+            p.set(Parameters.KEY.SYN_PERM_TRIM_THRESHOLD, 0.05);
+            p.set(Parameters.KEY.SYN_PERM_CONNECTED, 0.4);
+            p.set(Parameters.KEY.MAX_BOOST, 10.0);
+            p.set(Parameters.KEY.DUTY_CYCLE_PERIOD, 7);
+            p.set(Parameters.KEY.RANDOM, new MersenneTwister(42));
 
             Map<String, Object> params = new HashMap<>();
             params.put(KEY_MODE, Anomaly.Mode.PURE);
@@ -79,6 +78,7 @@ public class TestHarness {
                     .add(Network.createRegion("r1")
                             .add(Network.createLayer("1", p)
                                     .alterParameter(Parameters.KEY.AUTO_CLASSIFY, Boolean.TRUE)
+                                    .alterParameter(Parameters.KEY.INFERRED_FIELDS, getInferredFieldsMaps())
                                     .add(new TemporalMemory())
                                     .add(new SpatialPooler())
                                     .add(MultiEncoder.builder().name("").build())));
@@ -99,6 +99,12 @@ public class TestHarness {
             return fieldEncodings;
         }
 
+        public static Map<String, Class<? extends Classifier>> getInferredFieldsMaps() {
+            Map<String, Class<? extends Classifier>> map = new LinkedHashMap<>();
+            map.put("dayOfWeek", CLAClassifier.class);
+            return map;
+        }
+
         /**
          * Returns Encoder parameters for the "dayOfWeek" test encoder.
          * @return
@@ -107,7 +113,7 @@ public class TestHarness {
             Map<String, Map<String, Object>> fieldEncodings = getFieldEncodingMap();
 
             Parameters p = Parameters.getEncoderDefaultParameters();
-            p.setParameterByKey(Parameters.KEY.FIELD_ENCODING_MAP, fieldEncodings);
+            p.set(Parameters.KEY.FIELD_ENCODING_MAP, fieldEncodings);
 
             return p;
         }
@@ -118,36 +124,35 @@ public class TestHarness {
          */
         public static Parameters getParameters() {
             Parameters parameters = Parameters.getAllDefaultParameters();
-            parameters.setParameterByKey(Parameters.KEY.INPUT_DIMENSIONS, new int[] { 8 });
-            parameters.setParameterByKey(Parameters.KEY.COLUMN_DIMENSIONS, new int[] { 20 });
-            parameters.setParameterByKey(Parameters.KEY.CELLS_PER_COLUMN, 6);
+            parameters.set(Parameters.KEY.INPUT_DIMENSIONS, new int[] { 8 });
+            parameters.set(Parameters.KEY.COLUMN_DIMENSIONS, new int[] { 20 });
+            parameters.set(Parameters.KEY.CELLS_PER_COLUMN, 6);
 
             //SpatialPooler specific
-            parameters.setParameterByKey(Parameters.KEY.POTENTIAL_RADIUS, 12);//3
-            parameters.setParameterByKey(Parameters.KEY.POTENTIAL_PCT, 0.5);//0.5
-            parameters.setParameterByKey(Parameters.KEY.GLOBAL_INHIBITION, false);
-            parameters.setParameterByKey(Parameters.KEY.LOCAL_AREA_DENSITY, -1.0);
-            parameters.setParameterByKey(Parameters.KEY.NUM_ACTIVE_COLUMNS_PER_INH_AREA, 5.0);
-            parameters.setParameterByKey(Parameters.KEY.STIMULUS_THRESHOLD, 1.0);
-            parameters.setParameterByKey(Parameters.KEY.SYN_PERM_INACTIVE_DEC, 0.01);
-            parameters.setParameterByKey(Parameters.KEY.SYN_PERM_ACTIVE_INC, 0.1);
-            parameters.setParameterByKey(Parameters.KEY.SYN_PERM_TRIM_THRESHOLD, 0.05);
-            parameters.setParameterByKey(Parameters.KEY.SYN_PERM_CONNECTED, 0.1);
-            parameters.setParameterByKey(Parameters.KEY.MIN_PCT_OVERLAP_DUTY_CYCLE, 0.1);
-            parameters.setParameterByKey(Parameters.KEY.MIN_PCT_ACTIVE_DUTY_CYCLE, 0.1);
-            parameters.setParameterByKey(Parameters.KEY.DUTY_CYCLE_PERIOD, 10);
-            parameters.setParameterByKey(Parameters.KEY.MAX_BOOST, 10.0);
-            parameters.setParameterByKey(Parameters.KEY.SEED, 42);
-            parameters.setParameterByKey(Parameters.KEY.SP_VERBOSITY, 0);
+            parameters.set(Parameters.KEY.POTENTIAL_RADIUS, 12);//3
+            parameters.set(Parameters.KEY.POTENTIAL_PCT, 0.5);//0.5
+            parameters.set(Parameters.KEY.GLOBAL_INHIBITION, false);
+            parameters.set(Parameters.KEY.LOCAL_AREA_DENSITY, -1.0);
+            parameters.set(Parameters.KEY.NUM_ACTIVE_COLUMNS_PER_INH_AREA, 5.0);
+            parameters.set(Parameters.KEY.STIMULUS_THRESHOLD, 1.0);
+            parameters.set(Parameters.KEY.SYN_PERM_INACTIVE_DEC, 0.01);
+            parameters.set(Parameters.KEY.SYN_PERM_ACTIVE_INC, 0.1);
+            parameters.set(Parameters.KEY.SYN_PERM_TRIM_THRESHOLD, 0.05);
+            parameters.set(Parameters.KEY.SYN_PERM_CONNECTED, 0.1);
+            parameters.set(Parameters.KEY.MIN_PCT_OVERLAP_DUTY_CYCLES, 0.1);
+            parameters.set(Parameters.KEY.MIN_PCT_ACTIVE_DUTY_CYCLES, 0.1);
+            parameters.set(Parameters.KEY.DUTY_CYCLE_PERIOD, 10);
+            parameters.set(Parameters.KEY.MAX_BOOST, 10.0);
+            parameters.set(Parameters.KEY.SEED, 42);
 
             //Temporal Memory specific
-            parameters.setParameterByKey(Parameters.KEY.INITIAL_PERMANENCE, 0.2);
-            parameters.setParameterByKey(Parameters.KEY.CONNECTED_PERMANENCE, 0.8);
-            parameters.setParameterByKey(Parameters.KEY.MIN_THRESHOLD, 5);
-            parameters.setParameterByKey(Parameters.KEY.MAX_NEW_SYNAPSE_COUNT, 6);
-            parameters.setParameterByKey(Parameters.KEY.PERMANENCE_INCREMENT, 0.05);
-            parameters.setParameterByKey(Parameters.KEY.PERMANENCE_DECREMENT, 0.05);
-            parameters.setParameterByKey(Parameters.KEY.ACTIVATION_THRESHOLD, 4);
+            parameters.set(Parameters.KEY.INITIAL_PERMANENCE, 0.2);
+            parameters.set(Parameters.KEY.CONNECTED_PERMANENCE, 0.8);
+            parameters.set(Parameters.KEY.MIN_THRESHOLD, 5);
+            parameters.set(Parameters.KEY.MAX_NEW_SYNAPSE_COUNT, 6);
+            parameters.set(Parameters.KEY.PERMANENCE_INCREMENT, 0.05);
+            parameters.set(Parameters.KEY.PERMANENCE_DECREMENT, 0.05);
+            parameters.set(Parameters.KEY.ACTIVATION_THRESHOLD, 4);
 
             return parameters;
         }

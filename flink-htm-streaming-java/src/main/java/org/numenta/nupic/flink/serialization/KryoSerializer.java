@@ -7,7 +7,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.numenta.nupic.Persistable;
+import org.numenta.nupic.model.Persistable;
 import org.numenta.nupic.network.Network;
 import org.numenta.nupic.serialize.HTMObjectInput;
 import org.numenta.nupic.serialize.HTMObjectOutput;

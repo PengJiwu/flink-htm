@@ -124,7 +124,7 @@ public abstract class AbstractHTMInferenceOperator<IN>
         if(inference != null) {
             NetworkInference outputInference = NetworkInference.fromInference(inference);
             StreamRecord<Tuple2<IN,NetworkInference>> streamRecord = new StreamRecord<>(
-                    new Tuple2(record, outputInference),
+                    new Tuple2<>(record, outputInference),
                     timestamp);
             output.collect(streamRecord);
         }
@@ -147,7 +147,7 @@ public abstract class AbstractHTMInferenceOperator<IN>
         // handle the situation where an encoder parameter map was supplied rather than a fully-baked encoder.
         if(encoder.getEncoders(encoder) == null || encoder.getEncoders(encoder).size() < 1) {
             Map<String, Map<String, Object>> encoderParams =
-                    (Map<String, Map<String, Object>>) network.getParameters().getParameterByKey(Parameters.KEY.FIELD_ENCODING_MAP);
+                    (Map<String, Map<String, Object>>) network.getParameters().get(Parameters.KEY.FIELD_ENCODING_MAP);
             if(encoderParams == null || encoderParams.size() < 1) {
                 throw new IllegalStateException("No field encoding map found for MultiEncoder");
             }

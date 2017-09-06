@@ -6,12 +6,14 @@ import org.apache.flink.core.fs.FileSystem.WriteMode
 import org.apache.flink.streaming.api.scala._
 import org.joda.time.DateTime
 import org.numenta.nupic.Parameters.KEY
-import org.numenta.nupic.algorithms.{Anomaly, SpatialPooler, TemporalMemory}
+import org.numenta.nupic.algorithms.{Anomaly, CLAClassifier, SpatialPooler, TemporalMemory}
 import org.numenta.nupic.encoders.DateEncoder._
 import org.numenta.nupic.encoders.scala._
 import org.numenta.nupic.flink.streaming.examples.common.NetworkDemoParameters
 import org.numenta.nupic.network.Network
 import org.numenta.nupic.flink.streaming.api.scala._
+
+import scala.collection.JavaConverters._
 
 trait HotGymModel {
   case class Consumption(timestamp: DateTime, consumption: Double)
@@ -30,6 +32,7 @@ trait HotGymModel {
       .add(Network.createRegion("Region 1")
         .add(Network.createLayer("Layer 2/3", params)
           .alterParameter(KEY.AUTO_CLASSIFY, true)
+          .alterParameter(KEY.INFERRED_FIELDS, Map("consumption" -> classOf[CLAClassifier]).asJava)
           .add(encoder)
           .add(Anomaly.create())
           .add(new TemporalMemory())
